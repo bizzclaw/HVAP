@@ -1,14 +1,10 @@
 WAC
 ===
 
-WeltEnSTurm's Addons Compilation for Garry's Mod.
+H-WAC for Garry's Mod.
 Contains:
 * Aircraft
-* Damage System
-* Huge Construct Map
-* Gravity Controller
 * Weapons
-* Several Scripts
 
 Installation
 ------------
