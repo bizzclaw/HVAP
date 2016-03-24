@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/hvap/arma3/mi48/heli_attack_02_glass_ca"
+	"$alphatest" 1
+}
