@@ -1,0 +1,7 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models\sentry\uh1d\Tiger_glass"
+	"$nocull" "1"
+	"$translucent" "1"
+
+}

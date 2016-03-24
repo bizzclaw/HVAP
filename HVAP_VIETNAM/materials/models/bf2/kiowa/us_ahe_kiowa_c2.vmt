@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/BF2/Kiowa/us_ahe_kiowa_c2"
+	"$translucent" 1
+}

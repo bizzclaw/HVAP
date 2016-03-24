@@ -1,6 +1,0 @@
-"VertexLitGeneric"
-{
-	"$baseTexture" "models\weapons\v_models\smg_p90\rail"
-	"$bumpmap" "models\weapons\v_models\smg_p90\rail.norm"
-	"$normalmapalphaenvmapmask" 1
-}

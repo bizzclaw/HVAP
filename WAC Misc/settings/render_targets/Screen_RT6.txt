@@ -1,6 +1,0 @@
-"Screen_RT6"
-{
-	"Name"		"Screen_RT6"
-	"Width"		"512"
-	"Height"	"512"
-}

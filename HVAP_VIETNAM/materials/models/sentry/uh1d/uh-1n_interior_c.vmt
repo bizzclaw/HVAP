@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/sentry/UH1D/uh-1n_interior_c"
+	"$nocull" 1
+}
