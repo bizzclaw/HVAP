@@ -80,6 +80,8 @@ function ENT:Think()
 			self:KillRotor()
 			self.rotorRPM = 0
 		end	
+	else
+		self.rotorRPM = 0
 	end
 	
 	self:NextThink(crt)
