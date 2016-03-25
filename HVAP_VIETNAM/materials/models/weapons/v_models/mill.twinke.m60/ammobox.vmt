@@ -1,6 +1,0 @@
-"VertexlitGeneric"
-{
-"$basetexture" "models\weapons\v_models\Mill.Twinke.M60\Ammobox"
-"$envmap" "env_cubemap"
-"$envmapmask" "models\weapons\v_models\Mill.Twinke.M60\ammobox_ref"
-}
