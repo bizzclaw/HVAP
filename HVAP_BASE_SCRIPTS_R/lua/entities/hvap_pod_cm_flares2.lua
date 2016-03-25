@@ -13,10 +13,10 @@ ENT.Instructions = ""
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
 
-ENT.Ammo = 50
-ENT.FireRate = 210--1000
-ENT.RearmTime = 6
-ENT.Cooldown = 5
+ENT.Ammo = 120
+ENT.FireRate = 700--1000
+ENT.RearmTime = 20
+ENT.Cooldown = 20
 ENT.Launched = 0
 ENT.Shooting = false
 ENT.Fired = true
@@ -24,7 +24,7 @@ ENT.CanShoot = false
 ENT.shouldShoot = false
 
 ENT.Sounds = {
-	shoot = "hvap/gun/misc/flares_1.wav",
+	shoot = "hvap/gun/misc/flares_2.wav",
 }
 
 if SERVER then
@@ -75,7 +75,7 @@ function ENT:Think()
 		self.Shooting=true
 		self.sounds.shoot:Stop()		
 		self.sounds.shoot:Play()
-	elseif self.Launched >= 5 then
+	elseif self.Launched >= 20 then
 		self.Shooting = false
 		self.Launched = 0
 		self.Fired = true

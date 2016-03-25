@@ -54,7 +54,7 @@ function ENT:fireSmoke(pos, ang)
 	effectdata:SetScale(8)
 	util.Effect("MuzzleEffect", effectdata)
 	constraint.NoCollide(self.aircraft, b, 0, 0)
-	self.Entity:EmitSound( "hvap/gun/misc/smoke_launch_2.wav" )
+	self.Entity:EmitSound( "hvap/gun/misc/smoke_launch_1.wav" )
 end
 
 function ENT:trigger(b, seat)

@@ -4,7 +4,7 @@ AddCSLuaFile("hvap_pod_rkt_hydra.lua")
 ENT.Base = "hvap_pod_base"
 ENT.Type = "anim"
 
-ENT.PrintName = "Hydra 70"
+ENT.PrintName = "Hydra 40"
 ENT.Author = "The_HAVOK"
 ENT.Category = hvap.aircraft.spawnCategory
 ENT.Contact = ""
@@ -46,7 +46,7 @@ function ENT:fireRocket(pos)
 	b.BallisticDrag	= 256
 	b.Drift= 1.6
 	b.TissueDamage	= math.Rand(160,200)
-	b.Mdl="models/missiles/ffar_70mm.mdl"
+	b.Mdl="models/missiles/ffar_40mm.mdl"
 	b:SetPos(pos2)
 	b:SetAngles(ang)
 	b.Size=70
