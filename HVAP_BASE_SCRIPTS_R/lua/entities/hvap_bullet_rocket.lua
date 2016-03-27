@@ -91,11 +91,11 @@ function ENT:Think()
 	if self.Impacted then self.Impacted = false end
 
 	if self.Timeleft < CurTime() then
-		self:Remove()			
+		self:Impact()			
 	end
 	
 	if self.Flightvector:Length() < 10 or self.Riccochet >= 5 then
-		self:Remove()
+		self:Impact()
 	end
 
 	self.sound:Play()
@@ -125,7 +125,7 @@ function ENT:Think()
 			effectdata:SetNormal( tr.HitNormal )
 			effectdata:SetScale( 15*self.EffectSize )
 			util.Effect( "watersplash", effectdata )
-			self:Remove()
+			self:Impact(tr)
 			return true
 		end
 		
@@ -153,16 +153,16 @@ end
 
 function ENT:Impact(tr)
 	local effectdata = EffectData()
-	effectdata:SetOrigin(tr.HitPos)
-	effectdata:SetNormal(tr.HitNormal)
+	effectdata:SetOrigin(tr.HitPos or self:GetPos())
+	effectdata:SetNormal(tr.HitNormal or (self:GetPos() + self:GetForward()*2) )
 	effectdata:SetStart(self.Flightvector:GetNormalized())
 	effectdata:SetScale(self.EffectSize)
-	effectdata:SetRadius(tr.MatType)
+	effectdata:SetRadius(tr.MatType or 1 )
 	util.Effect("hvap_rocket_explode", effectdata )
-	util.ScreenShake(tr.HitPos, 10, 5, 0.4, self.Size*2.56 )
-	util.Decal("scorch", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
+	util.ScreenShake(tr.HitPos or self:GetPos(), 10, 5, 0.4, self.Size*2.56 )
+	util.Decal("scorch", tr.HitPos or self:GetPos() + tr.HitNormal, tr.HitPos - tr.HitNormal)
 
-	util.BlastDamage(self.Owner, self.Owner, tr.HitPos, self.Radius*2, self.TissueDamage*2)
+	util.BlastDamage(self.Owner, self.Owner, tr.HitPosor (self:GetPos() + self:GetForward()*2), self.Radius*2, self.TissueDamage*2)
 	self:Remove()
 end
 
