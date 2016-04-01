@@ -7,7 +7,7 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
-
+	if self.SingleFire then return end
 	local frt = CurTime()-self.LastThink
 	local e = LocalPlayer():GetViewEntity()
 	if !IsValid(e) then e = LocalPlayer() end

@@ -75,7 +75,7 @@ function ENT:fireBullet(pos)
 	if ( self.bulletIndex > #self.AmmoBelt ) then
 	self.bulletIndex = 1
 	end
-	self:EmitSound( self.Sounds.shoot[math.random(1,self.shootnum)], 170, self.SndPitch+math.random(-4,4), 1)
+	self:EmitSound( self.Sounds.shoot, 170, self.SndPitch+math.random(-4,4), 1)
 	self.Overheated = true
 	self.CurrentHeat = 1000
 end

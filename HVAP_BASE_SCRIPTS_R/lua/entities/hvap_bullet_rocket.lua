@@ -162,7 +162,7 @@ function ENT:Impact(tr)
 	util.ScreenShake(tr.HitPos or self:GetPos(), 10, 5, 0.4, self.Size*2.56 )
 	util.Decal("scorch", tr.HitPos or self:GetPos() + tr.HitNormal, tr.HitPos - tr.HitNormal)
 
-	util.BlastDamage(self.Owner, self.Owner, tr.HitPosor (self:GetPos() + self:GetForward()*2), self.Radius*2, self.TissueDamage*2)
+	util.BlastDamage(self.Owner, self.Owner, tr.HitPos or (self:GetPos() + self:GetForward()*2), self.Radius*2, self.TissueDamage*2)
 	self:Remove()
 end
 

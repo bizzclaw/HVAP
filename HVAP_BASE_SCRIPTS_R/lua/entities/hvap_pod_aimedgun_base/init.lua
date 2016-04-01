@@ -88,6 +88,10 @@ function ENT:fireBullet(pos)
 	self:AddOnRemove(b)
 	self:MuzzleEffect(pos2, self.Caliber, ang)
 	
+	if self.SingleFire then 
+		self.aircraft:EmitSound( self.Sounds.shoot, 170, self.SndPitch+math.random(-4,4), 1)
+	end
+	
 	self.bulletIndex = self.bulletIndex + 1
 	if ( self.bulletIndex > #self.AmmoBelt ) then
 	self.bulletIndex = 1
