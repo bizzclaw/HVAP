@@ -174,7 +174,7 @@ function ENT:addAttachments()
 		for k, v in pairs(self.WeaponAttachments) do
 			local t = self:addEntity("hvap_turret")			
 			t:SetPos(self:LocalToWorld(v.pos))
-			t:SetAngles(self:GetAngles())
+			t:SetAngles(self:GetAngles()+v.ang)
 			t:SetModel(v.model)
 			t:SetOwner(self.Owner)
 			t:SetParent(self)
@@ -194,7 +194,7 @@ function ENT:addAttachments()
 	if self.Camera then
 		local t = self:addEntity("hvap_turret")		
 		t:SetPos(self:LocalToWorld(self.Camera.pos))
-		t:SetAngles(self:GetAngles())
+		t:SetAngles(self:GetAngles()+v.ang)
 		t:SetModel(self.Camera.model)
 		t:SetOwner(self.Owner)
 		t:SetParent(self)
@@ -337,7 +337,7 @@ function ENT:attachmentThink()
 		if !t:IsValid() then return end
 		local localAng = self:WorldToLocalAngles((tr.HitPos - t:GetPos()):Angle())
 		localAng = Angle(t.restrictPitch and 0 or localAng.p, t.restrictYaw and 0 or localAng.y, t.r or 0)
-		t:SetAngles(self:LocalToWorldAngles(localAng))
+		t:SetAngles(self:LocalToWorldAngles(localAng+t.ang))
 		if t.offset then
 			t:SetPos(self:LocalToWorld(t.pos) + t:LocalToWorld(t.offset) - t:GetPos())
 		end
