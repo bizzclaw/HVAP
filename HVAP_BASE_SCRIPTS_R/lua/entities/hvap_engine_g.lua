@@ -14,13 +14,14 @@ ENT.Instructions 		= ""
 ENT.Spawnable			= false
 ENT.AdminSpawnable	= false
 ENT.engineRpm = 0
-ENT.engineTorque = 0
+ENT.enginePower = 0
 ENT.engineHealth = 0
 ENT.FuelSub = 0
 ENT.Model = "models/hunter/blocks/cube05x05x05.mdl"
 ENT.Disabled = false
 ENT.Burning = false
 ENT.Smoking = false
+ENT.EngineFire = NULL
 ENT.HealthScale = 1
 ENT.valid = false
 
@@ -37,7 +38,7 @@ end
 if CLIENT then
 
 function ENT:Draw()
-	self:DrawModel()
+
 end
 
 elseif SERVER then
@@ -64,26 +65,23 @@ function ENT:Think()
 	self.HealthScale = self.engineHealth/self.BaseHealth
 	local rpmscl = self.engineRpm/self.MaxRPM
 
-	if self.vehicle.active and self.engineHealth > 0 then	
-		self.engineRpm = math.Clamp(self.engineRpm+FrameTime()*((self.vehicle.StartSpd+1)*32), 0, self.MaxRPM+(self.MaxRPM*(self.HealthScale-1))/1.92)	
+	if self.aircraft.active and self.engineHealth > 0 then	
+		self.engineRpm = math.Clamp(self.engineRpm+FrameTime()*((self.aircraft.StartSpd+1)*32), 0, self.MaxRPM+(self.MaxRPM*(self.HealthScale-1))/math.random(2,3))	
 		self.FuelSub = ((1/rpmscl)*(1/self.HealthScale)/100)*self.Consumption
-		if self.Smoking and !self.Burning then
+		if self.Smoking and !self.Burning and self:WaterLevel() == 0 then
 			self:CreateSmoke()
 		end
 		self:CreateEffect()
 	else
-		self.engineRpm = math.Clamp(self.engineRpm-FrameTime()*(self.vehicle.StartSpd+1)*20, 0, self.MaxRPM)
-		if self.Disabled then
-			self.FuelSub = 10
-		else
-			self.FuelSub = 0
-		end
+		self.engineRpm = math.Clamp(self.engineRpm-FrameTime()*(self.aircraft.StartSpd+1)*20, 0, self.MaxRPM)
+		self.FuelSub = 0
 	end	
 	
-	if self.Burning then
+	if self.Burning and self:WaterLevel() == 0 then
 		self:DamageEngine(0.05)
 		self:Burn()
-	end		
+		self.Smoking = false
+	end
 
 	if self.HealthScale < .90 and !self.Smoking then
 		self.Smoking = true	
@@ -91,6 +89,8 @@ function ENT:Think()
 	
 	if self.HealthScale < .25 and !self.Burning then
 		self.Burning = true
+	else
+		self.Burning = false
 	end
 	
 	if self.engineHealth == 0 and !self.Disabled then
@@ -105,7 +105,7 @@ function ENT:Think()
 		self.Disabled = true
 	end
 	
-	self.engineTorque = math.Clamp(rpmscl*self.Torque+(self.Torque*(self.HealthScale-1)/10), 0, self.Torque)		
+	self.enginePower = math.Clamp(rpmscl*self.Power+(self.Power*(self.HealthScale-1)/10), 0, self.Power)		
 	self:NextThink(CurTime()+0.0512)
 
 	return true
@@ -114,7 +114,7 @@ end
 function ENT:DamageEngine(dmg)
 
 	if self.Disabled then return end
-	self.engineHealth = math.Clamp(self.engineHealth - dmg/2, 0, self.BaseHealth)
+	self.engineHealth = math.Clamp(self.engineHealth - dmg/4, 0, self.BaseHealth)
 
 	if self.HealthScale <= 0 and !self.Disabled then
 	end
@@ -125,6 +125,8 @@ function ENT:DamageEngine(dmg)
 	
 	if self.HealthScale < .25 and !self.Burning then
 		self.Burning = true
+	else
+		self.Burning = false
 	end
 	
 end
@@ -157,15 +159,28 @@ function ENT:CreateEffect()
 end
 
 function ENT:Burn()
-	if self.Burning and !self.EngineFire then	
+	if self.Burning and !self.EngineFire:IsValid() then	
 		local fire = ents.Create("env_fire_trail")
 		fire:SetPos(self:LocalToWorld(self.FirePos))
 		fire:Spawn()
 		fire:SetParent(self.Entity)
 		self.sounds.burn:Play()
-		self.Smoking = false
 		self.EngineFire = fire
 		self:AddOnRemove(fire)
+	end
+end
+
+function ENT:Repair(amt)
+	if self.engineHealth < self.BaseHealth then
+		self.engineHealth = math.Clamp(self.engineHealth + self.BaseHealth/amt, 0, self.BaseHealth )
+		self:EmitSound("hvap/repair_loop.wav", 100, 100+amt*10)
+		self.Disabled = false
+		self.Burning = false
+		self.Smoking = false
+		self.sounds.burn:Stop()
+		if self.EngineFire:IsValid() then
+			self.EngineFire:Remove()
+		end
 	end
 end
 

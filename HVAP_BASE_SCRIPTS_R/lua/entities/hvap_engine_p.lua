@@ -12,15 +12,18 @@ ENT.Purpose 			= ""
 ENT.Instructions 		= ""
 
 ENT.Spawnable			= false
-ENT.AdminSpawnable		= false
-
+ENT.AdminSpawnable	= false
 ENT.engineRpm = 0
 ENT.enginePower = 0
 ENT.engineHealth = 0
 ENT.FuelSub = 0
+ENT.Model = "models/hunter/blocks/cube05x05x05.mdl"
 ENT.Disabled = false
 ENT.Burning = false
 ENT.Smoking = false
+ENT.EngineFire = NULL
+ENT.HealthScale = 1
+ENT.valid = false
 
 ENT.Sounds = {
 	burn = "hvap/tank/tank_fire_01.wav",	
@@ -34,18 +37,18 @@ end
 
 if CLIENT then
 
+function ENT:Draw()
+
+end
+
 elseif SERVER then
 
 function ENT:Initialize()
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetMoveType(MOVETYPE_NONE)
 	self.Entity:SetSolid(SOLID_NONE)
-	self.Phys = self:GetPhysicsObject()
-	self.Phys:Wake()
-	self.Phys:SetMass(0)
-	self.Phys:EnableGravity(false)
-	self.Phys:EnableDrag(false)
-	self:SetTrigger(false)
+	self.Entity:SetModel(self.Model)
+	self:SetTrigger(false)	 
 	self.OnRemoveEntities = {}
 	self.sounds = {}
 	for n, p in pairs(self.Sounds) do
@@ -53,34 +56,42 @@ function ENT:Initialize()
 			self.sounds[n] = CreateSound(self, p)
 		end
 	end
+	self.valid = true
 end
 
 function ENT:Think()
-	local crt = CurTime()+0.05
+	if !self.valid then return end
+
 	self.HealthScale = self.engineHealth/self.BaseHealth
 	local rpmscl = self.engineRpm/self.MaxRPM
-	local powerscl = self.enginePower/self.Power
 
-	if self.aircraft.active and self.HealthScale > 0 and self.aircraft.FuelScl > 0 then	
-		self.engineRpm = math.Clamp(self.engineRpm+FrameTime()*(self.aircraft.StartSpd*10), 0, self.MaxRPM+(self.MaxRPM*(self.HealthScale-1))/1.92)	
+	if self.aircraft.active and self.engineHealth > 0 then	
+		self.engineRpm = math.Clamp(self.engineRpm+FrameTime()*((self.aircraft.StartSpd+1)*32), 0, self.MaxRPM+(self.MaxRPM*(self.HealthScale-1))/math.random(2,3))	
 		self.FuelSub = ((1/rpmscl)*(1/self.HealthScale)/100)*self.Consumption
-		if self.Smoking and !self.Burning then
+		if self.Smoking and !self.Burning and self:WaterLevel() == 0 then
 			self:CreateSmoke()
 		end
 		self:CreateEffect()
 	else
-		self.engineRpm = math.Clamp(self.engineRpm-FrameTime()*self.aircraft.StartSpd*1.92, 0, self.MaxRPM)
-		if self.Disabled then
-			self.FuelSub = 10
-		else
-			self.FuelSub = 0
-		end
+		self.engineRpm = math.Clamp(self.engineRpm-FrameTime()*(self.aircraft.StartSpd+1)*20, 0, self.MaxRPM)
+		self.FuelSub = 0
 	end	
 	
-	if self.Burning then
+	if self.Burning and self:WaterLevel() == 0 then
 		self:DamageEngine(0.05)
 		self:Burn()
-	end		
+		self.Smoking = false
+	end
+
+	if self.HealthScale < .90 and !self.Smoking then
+		self.Smoking = true	
+	end
+	
+	if self.HealthScale < .25 and !self.Burning then
+		self.Burning = true
+	else
+		self.Burning = false
+	end
 	
 	if self.engineHealth == 0 and !self.Disabled then
 		local effectdata = EffectData()
@@ -90,64 +101,38 @@ function ENT:Think()
 		util.Effect("Explosion", effectdata)
 		util.Effect("HelicopterMegaBomb", effectdata)
 		util.Effect("cball_explode", effectdata)
-		util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), 320, 5)	
+		util.BlastDamage(self.Entity, self.Entity, self.Entity:GetPos(), 320, 50)	
 		self.Disabled = true
 	end
 	
 	self.enginePower = math.Clamp(rpmscl*self.Power+(self.Power*(self.HealthScale-1)/10), 0, self.Power)		
-	self:NextThink(crt)
+	self:NextThink(CurTime()+0.0512)
+
 	return true
 end
 
 function ENT:DamageEngine(dmg)
 
 	if self.Disabled then return end
-	self.engineHealth = math.Clamp(self.engineHealth - dmg/2, 0, self.BaseHealth)
-	
-	if self.HealthScale < .9 then
-
-	end
-
-	if self.HealthScale < .8 then
-		self.Smoking = true	
-	end
-			
-	if self.HealthScale < .7 then
-	
-	end
-	
-	if self.HealthScale < .6 then
-	
-	end
-			
-	if self.HealthScale < .5 then
-	
-	end
-			
-	if self.HealthScale < .4 then
-	
-	end
-	
-	if self.HealthScale < .3 then
-		self.Burning = true	
-	end
-
-	if self.HealthScale < .2 then
-						
-	end
-		
-	if self.HealthScale < .1 then
-	
-	end
+	self.engineHealth = math.Clamp(self.engineHealth - dmg/4, 0, self.BaseHealth)
 
 	if self.HealthScale <= 0 and !self.Disabled then
 	end
+	
+	if self.HealthScale < .90 and !self.Smoking then
+		self.Smoking = true	
+	end
+	
+	if self.HealthScale < .25 and !self.Burning then
+		self.Burning = true
+	else
+		self.Burning = false
+	end
+	
 end
 
 function ENT:CreateSmoke()
-	if self.SmokePos then
-		cureffect=0
-		cureffect=CurTime()+0.01
+	if self.SmokePos and self:IsValid() then
 		local ed=EffectData()
 		local colmod = (math.random(169,171)*self.HealthScale)
 		ed:SetEntity(self)
@@ -162,9 +147,7 @@ function ENT:CreateSmoke()
 end
 
 function ENT:CreateEffect()
-	if self.EffectPos then
-		cureffect=0
-		cureffect=CurTime()+0.01
+	if self.EffectPos and self:IsValid() then
 		local ed=EffectData()
 		ed:SetEntity(self)
 		ed:SetOrigin(self.EffectPos)
@@ -176,14 +159,28 @@ function ENT:CreateEffect()
 end
 
 function ENT:Burn()
-	if self.Burning and !self.EngineFire then	
+	if self.Burning and !self.EngineFire:IsValid() then	
 		local fire = ents.Create("env_fire_trail")
 		fire:SetPos(self:LocalToWorld(self.FirePos))
 		fire:Spawn()
 		fire:SetParent(self.Entity)
 		self.sounds.burn:Play()
-		self.Smoking = false
 		self.EngineFire = fire
+		self:AddOnRemove(fire)
+	end
+end
+
+function ENT:Repair(amt)
+	if self.engineHealth < self.BaseHealth then
+		self.engineHealth = math.Clamp(self.engineHealth + self.BaseHealth/amt, 0, self.BaseHealth )
+		self:EmitSound("hvap/repair_loop.wav", 100, 100+amt*10)
+		self.Disabled = false
+		self.Burning = false
+		self.Smoking = false
+		self.sounds.burn:Stop()
+		if self.EngineFire:IsValid() then
+			self.EngineFire:Remove()
+		end
 	end
 end
 

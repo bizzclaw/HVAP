@@ -27,22 +27,19 @@ ENT.HeatMult = 22//ammount added per bullet fired  1000 threshold
 ENT.HeatTime = 4//time it takes for unoverheat
 ENT.Caliber = 7.62
 ENT.Spread = 0.512
-ENT.SndPitch = 110
+ENT.SndPitch = 85
 
 ENT.AmmoBelt = {--A165 Belt
-	"apit",
-	"ball",
-	"ball",
-	"apit",
 	"ball",
 	"ball",
 	"ball",
 	"ball",
+	"apt",
 }
 
 ENT.AmmoData = {
-	["apit"] = {
-		class = "hvap_bullet_api",
+	["apt"] = {
+		class = "hvap_bullet_ap",
 		info = {
 			Large=false,
 			SelfDestr=false,
@@ -50,9 +47,9 @@ ENT.AmmoData = {
 			Tracer=true,--tracer?
 			Timer=12,-- time to remove bullet or to explode if SelfDestr
 			col=Color(0, 255, 0),
-			Speed=853,--velocity m/s
+			Speed=850,--velocity m/s
 			Radius=7.62,--caliber
-			Penetrate= 7.62,--caliber
+			Penetrate= 7,--caliber
 			BallisticDrag	= 32,
 			Drift=2,
 			Mass=9.5,--g
@@ -72,7 +69,7 @@ ENT.AmmoData = {
 			col=Color(0, 0, 0),
 			Speed=853,--velocity m/s
 			Radius=7.62,--caliber
-			Penetrate= 10,--caliber
+			Penetrate= 7.62,--caliber
 			BallisticDrag = 32,
 			Drift=2,
 			Mass=9.5,--g

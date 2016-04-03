@@ -1,4 +1,4 @@
-AddCSLuaFile("hvap_ent_crate_fuel.lua")
+AddCSLuaFile("hvap_ent_crate_ammo.lua")
 
 ENT.Base = "base_anim"
 ENT.Type = "anim"

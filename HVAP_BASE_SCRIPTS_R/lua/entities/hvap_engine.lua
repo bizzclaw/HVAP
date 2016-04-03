@@ -68,7 +68,7 @@ function ENT:Think()
 	if self.aircraft.active and self.engineHealth > 0 then	
 		self.engineRpm = math.Clamp(self.engineRpm+FrameTime()*((self.aircraft.StartSpd+1)*32), 0, self.MaxRPM+(self.MaxRPM*(self.HealthScale-1))/math.random(2,3))	
 		self.FuelSub = ((1/rpmscl)*(1/self.HealthScale)/100)*self.Consumption
-		if self.Smoking and !self.Burning then
+		if self.Smoking and !self.Burning and self:WaterLevel() == 0 then
 			self:CreateSmoke()
 		end
 		self:CreateEffect()
@@ -77,7 +77,7 @@ function ENT:Think()
 		self.FuelSub = 0
 	end	
 	
-	if self.Burning then
+	if self.Burning and self:WaterLevel() == 0 then
 		self:DamageEngine(0.05)
 		self:Burn()
 		self.Smoking = false

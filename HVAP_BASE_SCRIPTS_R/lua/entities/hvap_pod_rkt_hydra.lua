@@ -49,7 +49,7 @@ function ENT:fireRocket(pos)
 	b.Mdl="models/missiles/ffar_70mm.mdl"
 	b:SetPos(pos2)
 	b:SetAngles(ang)
-	b.Size=70
+	b.Size=35
 	b.AircraftFiring=self.aircraft
 	b.Owner = self.seat:GetDriver()
 	b:Spawn()

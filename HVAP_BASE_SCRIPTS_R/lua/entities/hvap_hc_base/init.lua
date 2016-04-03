@@ -27,7 +27,6 @@ function ENT:Initialize()
 	end		
 	
 	self.entities = {}
-	table.insert(self.entities, self)
 		
 	self.OnRemoveEntities={}
 	self.OnRemoveFunctions={}
@@ -87,24 +86,29 @@ function ENT:Initialize()
 	self:addSeats()
 	self:addNpcTargets()
 	self:addAttachments()	
-	self:addExtras()	
+	self:addExtras()
+	self:addGrabber()
+	
+	self.winchcontroller=NULL
+	self.grabcooldown=0
 
 	if self.HasDoors and self.DoorFlip then
 		self:SetBodygroup(self.DoorBodygroup, 1)	
 	end
 	self.DoorIsOpen = true
 	
-	self.DisableDev = false
+	self.DisableDev = true
 	
 	local effectdata = EffectData()
 	effectdata:SetEntity( self )
 	util.Effect( "hvap_spawn", effectdata, true, true )		
+	table.insert(self.entities, self)
 	
 end
 
 function ENT:addEntity(name, nofx)
 	local e = ents.Create(name)
-	if not IsValid(e) then return nil end
+	if !IsValid(e) then return nil end
 	
 	if !nofx then
 		local effectdata = EffectData()
@@ -124,6 +128,9 @@ function ENT:addNpcTargets()
 	for _,s in pairs(self.HatingNPCs) do
 		self:Fire("SetRelationShip", s.." D_HT 99")
 	end
+end
+
+function ENT:AddStuff()
 end
 
 function ENT:addEngines()
@@ -212,6 +219,7 @@ function ENT:addWeapons()
 			pod.podIndex = i
 			self.weapons[i] = pod
 			self:AddOnRemove(pod)
+			table.insert(self.entities, pod)
 		end
 	end
 
@@ -232,6 +240,7 @@ function ENT:addWeapons()
 			pod2.podIndex = i
 			self.weapons2[i] = pod2
 			self:AddOnRemove(pod2)
+			table.insert(self.entities, pod2)
 		end
 	end
 end
@@ -323,6 +332,23 @@ function ENT:addAttachments()
 	end	
 end
 
+function ENT:addGrabber()
+	if self.Grabber then
+		local e=self:addEntity("prop_physics")
+		e:SetModel(self.Grabber.model)
+		e:SetPos(self:LocalToWorld(self.Grabber.pos))
+		e:Spawn()
+		e:Activate()
+		local ph=e:GetPhysicsObject()		
+			ph:SetMass(self.Grabber.mass)
+			ph:EnableDrag(true)
+		e:SetGravity(0.01)
+		self:AddOnRemove(e)
+		self.GrabberEnt=e		
+		self.Winch=constraint.Rope(self, self.GrabberEnt, 0, 0, self.Grabber.constraintpos1, self.Grabber.constraintpos2, 0, 0, 0, self.Grabber.width, self.Grabber.mat, false)
+	end	
+end
+
 function ENT:addExtras()
 	if self.Extras then
 		for k, v in pairs(self.Extras) do
@@ -354,8 +380,8 @@ function ENT:addWheels()
 			e:Spawn()
 			e:Activate()
 			local ph=e:GetPhysicsObject()
-			ph:SetMass(t.mass)
-			ph:EnableDrag(false)
+				ph:SetMass(t.mass)
+				ph:EnableDrag(false)
 			e:SetGravity(0.01)
 			ph:SetMaterial( "rubbertire" )
 			constraint.Axis(e,self,0,0,Vector(0,0,0),self:WorldToLocal(e:LocalToWorld(Vector(0,1,0))),0,0,t.friction,1)
@@ -790,7 +816,6 @@ function ENT:Think()
 
 	if self.nextUpdate<crt then
 		self:RocketAlert()
-		table.Merge(self.entities,constraint.GetAllConstrainedEntities(self))
 		self.nextUpdate = crt+0.1
 	end
 	
@@ -800,6 +825,24 @@ function ENT:Think()
 	self.Roll = self.Hover.r+self.Autolvl.r	
 	self.Pitch = self.Hover.p+self.Autolvl.p
 	self.Yaw = 0
+
+	if self.Grabber then
+		local ply=self.seats[self.Grabber.seat]:GetPassenger(0)
+		if ply:IsPlayer() then
+			if (ply:KeyDown(IN_FORWARD) or ply:KeyDown(IN_BACK)) and !self.sounds.Winch:IsPlaying() then
+				self.sounds.Winch:Play()
+			elseif !ply:KeyDown(IN_FORWARD) and !ply:KeyDown(IN_BACK) and self.sounds.Winch:IsPlaying() then
+				self.sounds.Winch:Stop()
+				self:EmitSound("vehicles/Crane/crane_extend_stop.wav", 100, 50)
+			end
+			if ply:KeyDown(IN_ATTACK) then
+				self.GrabberGrab(ply)
+			end
+		end
+		if !(self.winchcontroller==ply) then
+			self:SetWinch(ply)
+		end
+	end
 		
 	if self.disabled and !self.dead then	
 	
@@ -908,18 +951,18 @@ function ENT:calcHover(ph,pos,vel,ang)
 		local v=self:WorldToLocal(pos+vel)
 		local av=ph:GetAngleVelocity()
 
-		if self.controls.pitch < 0.1 then 
+		if self.controls.pitch < 0.2 then 
 			pitch = math.Clamp(-ang.p*0.6-av.y*0.6-v.x*0.025,-0.65,0.65)
 		else
 			pitch = 0
 		end
-		if self.controls.roll < 0.1 then 
+		if self.controls.roll < 0.2 then 
 			roll = math.Clamp(-ang.r*0.6-av.x*0.6+v.y*0.025,-0.65,0.65)
 		else
 			roll = 0
 		end
-		if self.controls.throttle < 0.1 then 
-			throttle = math.Clamp(-v.z*0.192, -0.5, 0.5)
+		if self.controls.throttle < 0.2 then 
+			throttle = math.Clamp(-v.z*0.256+av:Length()*0.025, -0.5, 0.5)
 		else 
 			throttle = 0
 		end	
@@ -1196,6 +1239,39 @@ function ENT:OnTakeDamage(dmg)
 			end	
 			self.disabled = true
 		end		
+	end
+end
+
+function ENT:SetWinch(ply)
+	if self.Winch then
+		self.Winch:Remove()
+		self.Winch=nil
+	end
+	self.winchcontroller=ply
+	if ply==NULL then
+		self.Winch=constraint.Rope(self, self.GrabberEnt, 0, 0, self.Grabber.constraintpos1, self.Grabber.constraintpos2, 0, 0, 0, self.Grabber.width, self.Grabber.mat, false)
+	else
+		self.Winch=constraint.Winch( self.seats[self.Grabber.seat]:GetPassenger(0), self, self.GrabberEnt, 0, 0, self.Grabber.constraintpos1, self.Grabber.constraintpos2, self.Grabber.width, KEY_W, KEY_S, self.Grabber.upspd, self.Grabber.downspd, self.Grabber.mat, false )
+	end
+end
+
+function ENT:GrabberGrab(ply)
+	if self.grabcooldown+1 > CurTime() then return end
+	if IsValid(self.GrabberEnt) and !self.GrabberC then
+		local trace=util.QuickTrace(self.GrabberEnt:GetPos(),self.GrabberEnt:GetUp()*-65,self.entities)
+		if IsValid(trace.Entity) and !(trace.Entity:GetClass()=="worldspawn") and !(trace.Entity:GetClass()=="prop_static") then
+			self.GrabberC=constraint.Weld(self.GrabberEnt, trace.Entity, 0, 0, 0, true)
+			self.GrabberN=constraint.NoCollide(self.GrabberEnt, trace.Entity, 0, 0)
+			self:EmitSound("vehicles/Crane/crane_magnet_switchon.wav", 100, 50)
+			self.grabcooldown=CurTime()
+		end
+	elseif IsValid(self.GrabberEnt) and self.GrabberC and self.GrabberN then
+		self.GrabberC:Remove()
+		self.GrabberC=nil
+		self.GrabberN:Remove()
+		self.GrabberN=nil
+		self:EmitSound("vehicles/Crane/crane_magnet_switchon.wav", 100, 50)
+		self.grabcooldown=CurTime()
 	end
 end
 	

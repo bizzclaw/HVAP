@@ -3,7 +3,7 @@ AddCSLuaFile("hvap_ent_crate_medium_parts.lua")
 ENT.Base = "base_anim"
 ENT.Type = "anim"
 
-ENT.PrintName = "Small Parts Crate"
+ENT.PrintName = "Medium Parts Crate"
 ENT.Author = hvap.author
 ENT.Category = hvap.menu.category
 ENT.Spawnable = true
