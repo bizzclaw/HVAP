@@ -37,6 +37,7 @@ function ENT:AddOnRemove(f)
 end
 
 ENT.Sounds = {
+	fire = "", -- single fire sound
 	shoot = "", -- sound played when firing
 	stop = "", -- sound played when stop firing
 	blankstop = "", -- sound played when firing but jammed
@@ -53,13 +54,15 @@ function ENT:addSounds()
 			sound.Add({
 				name = "hvap."..self.ClassName.."."..name,
 				channel = CHAN_AUTO,
-				soundlevel = (name == "shoot" and 145 or name == "stop" and 145 or 100),
+				soundlevel = (name == "shoot" and 145 or name == "stop" and 145 or name == "fire" and 145 or 100),
 				sound = value
 			})
 			self.sounds[name] = CreateSound(self, "hvap."..self.ClassName.."."..name)
 			if name == "shoot" then
 				self.sounds[name]:SetSoundLevel(145)
 			elseif name == "stop" then
+				self.sounds[name]:SetSoundLevel(145)
+			elseif name == "fire" then
 				self.sounds[name]:SetSoundLevel(145)
 			elseif name == "blankstop" then
 				self.sounds[name]:SetSoundLevel(100)

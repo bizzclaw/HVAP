@@ -1,6 +1,8 @@
 
 include("shared.lua")
 
+ENT.RenderGroup = RENDERGROUP_BOTH
+
 function ENT:receiveInput(name, value, seat)
 	local player = LocalPlayer()
 	if name == "FreeView"  then
@@ -496,7 +498,7 @@ function ENT:DrawPilotHud()
 	local throttle = self.Throttle
 	cam.Start3D2D(self:LocalToWorld(Vector(20,3.75,37.75)*self.Scale+self.Seats[1].pos), ang, 0.015*self.Scale)
 	surface.SetDrawColor(HudCol)
---self.FuelAmt  self:GetNWFloat("ehp")
+
 	local rects = {
 		{235, 249, 10, 2},
 		{255, 249, 10, 2},

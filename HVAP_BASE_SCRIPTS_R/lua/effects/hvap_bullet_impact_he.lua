@@ -106,7 +106,7 @@ self.Scale 		= math.Clamp(data:GetScale(), 0.8, 1.28)
 self.Radius 		= data:GetRadius() or 1
 self.Emitter 		= ParticleEmitter( self.Pos )
 
-	self.Mat=math.ceil(self.Radius)
+	self.Mat=math.ceil(self.Radius) or 1
 
 	if     mats[self.Mat][2]==1 then	self:Dust()	
 	elseif mats[self.Mat][2]==2 then	self:Dirt()

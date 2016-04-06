@@ -1,9 +1,9 @@
-AddCSLuaFile("hvap_pod_m2.lua")
+AddCSLuaFile("hvap_pod_m3.lua")
 
 ENT.Base = "hvap_pod_gun_base"
 ENT.Type = "anim"
 
-ENT.PrintName = "M2"
+ENT.PrintName = "M3"
 ENT.Author = "The_HAVOK"
 ENT.Category = hvap.aircraft.spawnCategoryC
 ENT.Contact = ""
@@ -13,7 +13,7 @@ ENT.Instructions = ""
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
 
-ENT.Name = "M2"
+ENT.Name = "M3"
 ENT.Ammo = 1000
 ENT.FireRate = 600
 ENT.Force = 9999999999
@@ -137,8 +137,8 @@ ENT.AmmoData = {
 }
 
 ENT.Sounds = {
-	shoot = "hvap/gun/m2_loop.wav", -- sound played when firing
-	stop = "hvap/gun/m2_end.wav", -- sound played when stop firing
+	shoot = "hvap/gun/m3_loop.wav", -- sound played when firing
+	stop = "hvap/gun/m3_end.wav", -- sound played when stop firing
 	blankstop = "hvap/gun/misc/overheated_click_stop.wav", -- sound played when firing but jammed
 	blankshoot = "hvap/gun/misc/overheated_click.wav", -- sound played when stop firing but hammed 
 	clickstop = "hvap/gun/misc/overheat_click_stop.wav", -- sound plaed when near overheat

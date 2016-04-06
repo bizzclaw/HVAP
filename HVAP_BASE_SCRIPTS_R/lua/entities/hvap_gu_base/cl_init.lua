@@ -1,6 +1,8 @@
 
 include("shared.lua")
 
+ENT.RenderGroup = RENDERGROUP_BOTH
+
 function ENT:receiveInput(name, value, seat)
 	local player = LocalPlayer()
 	if name == "FreeView"  then

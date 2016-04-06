@@ -10,10 +10,10 @@ function EFFECT:Init( data )
 	
 	self.Emitter = ParticleEmitter( self.Pos )
 		
-	local Smoke = self.Emitter:Add( "effects/fire_cloud"..math.random(1, 2), self.Pos )
+	local Smoke = self.Emitter:Add( "effects/fire_cloud"..math.random(1, 2), self.Pos + self.DirVec*64)
 	if (Smoke) then
 		Smoke:SetVelocity( self.DirVec + VectorRand():GetNormalized() )
-		Smoke:SetDieTime( math.Rand( 0.1 , 0.192 ) )
+		Smoke:SetDieTime( math.Rand( 0.08 , 0.128 ) )
 		Smoke:SetStartAlpha( math.Rand( 64, 76 ) )
 		Smoke:SetEndAlpha( 0 )
 		Smoke:SetStartSize( self.Scale/3.2 )
@@ -25,10 +25,10 @@ function EFFECT:Init( data )
 		Smoke:SetColor( 255,255,255 )
 	end
 
-	local Smoke = self.Emitter:Add( "particle/smokesprites_000"..math.random(1,9), self.Pos )
+	local Smoke = self.Emitter:Add( "particle/smokesprites_000"..math.random(1,9), self.Pos +self.DirVec*64)
 	if (Smoke) then
 		Smoke:SetVelocity( self.DirVec + VectorRand():GetNormalized() )
-		Smoke:SetDieTime( math.Rand( 1 , 1.92 ) )
+		Smoke:SetDieTime( math.Rand( 0.64 , 0.8 ) )
 		Smoke:SetStartAlpha( math.Rand( 60, 76 ) )
 		Smoke:SetEndAlpha( 0 )
 		Smoke:SetStartSize( self.Scale/2 )

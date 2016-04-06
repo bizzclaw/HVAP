@@ -40,12 +40,12 @@ function ENT:fireRocket(pos)
 	b:SetAngles(ang)
 	b.col=Color(220,170,170)
 	b.Speed=300
-	b.Radius=math.Rand(192,256)
+	b.Radius=math.Rand(128,160)
 	b.EffectSize = 16
 	b.Penetrate= 1
 	b.BallisticDrag	= 256
 	b.Drift= 1.6
-	b.TissueDamage	= math.Rand(160,200)
+	b.TissueDamage	= math.Rand(80,128)
 	b.Mdl="models/missiles/ffar_70mm.mdl"
 	b:SetPos(pos2)
 	b:SetAngles(ang)

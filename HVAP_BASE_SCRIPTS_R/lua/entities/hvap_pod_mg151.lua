@@ -1,9 +1,9 @@
-AddCSLuaFile("hvap_pod_m2.lua")
+AddCSLuaFile("hvap_pod_mg151.lua")
 
 ENT.Base = "hvap_pod_gun_base"
 ENT.Type = "anim"
 
-ENT.PrintName = "M2"
+ENT.PrintName = "MG151"
 ENT.Author = "The_HAVOK"
 ENT.Category = hvap.aircraft.spawnCategoryC
 ENT.Contact = ""
@@ -13,7 +13,7 @@ ENT.Instructions = ""
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
 
-ENT.Name = "M2"
+ENT.Name = "MG151"
 ENT.Ammo = 1000
 ENT.FireRate = 600
 ENT.Force = 9999999999
@@ -23,39 +23,74 @@ ENT.CurrentHeat = 0
 ENT.CanShoot = true
 
 ENT.CoolDown = 4//ammount taken from heat every sec
-ENT.HeatMult = 15//ammount added per bullet fired  1000 threshold
+ENT.HeatMult = 8//ammount added per bullet fired  1000 threshold
 ENT.HeatTime = 1//time it takes for unoverheat
-ENT.Caliber = 12.5
-ENT.Spread = 0.6144
+ENT.Caliber = 20
+ENT.Spread = 0.256
 ENT.SndPitch = 100
 
 ENT.AmmoBelt = {--A165 Belt
-	"ap",
-	"apt",
-	"ap",
-
-	"api",
-	"api",
-	"api",
-	
-	"ap",
-	"ap",
-	"ap",
-	
-	"api",
-	"apit",
+	"heit",
+	"heit",
+	"heit",
+	"heit",
+	"hei",
+	"hei",
+	"hei",
+	"hei",
+	"aphe",	
+	"aphe",	
 	"api",	
-	
-	"ap",
-	"ap",	
-	
-	"api",
+	"api",	
+	"aphe",	
+	"aphe",	
+	"api",	
 	"api",	
 }
 
 ENT.AmmoData = {
-	["ap"] = {
-		class = "hvap_bullet_ap",
+	["heit"] = {
+		class = "hvap_bullet_he",
+		info = {
+			Large=false,
+			SelfDestr=true,
+			Flak=true,
+			Tracer=true,--tracer?
+			Timer=12,-- time to remove bullet or to explode if SelfDestr
+			col=Color(255, 255, 255),
+			Speed=700,--velocity m/s
+			Radius=32,--caliber
+			Penetrate= 0,--caliber
+			BallisticDrag	= 50.8,
+			Drift=1.5875,
+			Mass=102,--g
+			TissueDamage = math.Rand(128,160),--
+			EffectSize = 10,
+			Size=20--caliber
+		}
+	},
+	["hei"] = {
+		class = "hvap_bullet_he",
+		info = {
+			Large=false,
+			SelfDestr=false,
+			Flak=true,
+			Tracer=false,--tracer?
+			Timer=12,-- time to remove bullet or to explode if SelfDestr
+			col=Color(0, 0, 0),
+			Speed=700,--velocity m/s
+			Radius=32,--caliber
+			Penetrate= 0,--caliber
+			BallisticDrag	= 50.8,
+			Drift=1.5875,
+			Mass=102,--g
+			TissueDamage = math.Rand(128,160),--
+			EffectSize = 10,
+			Size=20--caliber
+		}
+	},
+	["aphe"] = {
+		class = "hvap_bullet_he",
 		info = {
 			Large=false,
 			SelfDestr=false,
@@ -63,15 +98,15 @@ ENT.AmmoData = {
 			Tracer=false,--tracer?
 			Timer=12,-- time to remove bullet or to explode if SelfDestr
 			col=Color(0, 0, 0),
-			Speed=890,--velocity m/s
+			Speed=785,--velocity m/s
 			Radius=32,--caliber
 			Penetrate= 20,--caliber
 			BallisticDrag	= 50.8,
 			Drift=1.5875,
 			Mass=102,--g
-			TissueDamage = math.Rand(34,45),--
+			TissueDamage = math.Rand(128,160),--
 			EffectSize = 10,
-			Size=12.7--caliber
+			Size=20--caliber
 		}
 	},
 	["api"] = {
@@ -83,62 +118,22 @@ ENT.AmmoData = {
 			Tracer=false,--tracer?
 			Timer=12,-- time to remove bullet or to explode if SelfDestr
 			col=Color(0, 0, 0),
-			Speed=890,--velocity m/s
+			Speed=785,--velocity m/s
 			Radius=32,--caliber
 			Penetrate= 20,--caliber
 			BallisticDrag	= 50.8,
 			Drift=1.5875,
 			Mass=102,--g
-			TissueDamage = math.Rand(34,45),--
+			TissueDamage = math.Rand(138,160),--
 			EffectSize = 10,
-			Size=12.7--caliber
+			Size=20--caliber
 		}
 	},	
-	["apt"] = {
-		class = "hvap_bullet_ap",
-		info = {
-			Large=false,
-			SelfDestr=false,
-			Flak=false,
-			Tracer=true,--tracer?
-			Timer=12,-- time to remove bullet or to explode if SelfDestr
-			col=Color(255, 20, 0),
-			Speed=890,--velocity m/s
-			Radius=32,--caliber
-			Penetrate= 20,--caliber
-			BallisticDrag	= 50.8,
-			Drift=1.5875,
-			Mass=102,--g
-			TissueDamage = math.Rand(34,42),--
-			EffectSize = 10,
-			Size=12.7--caliber
-		}
-	},
-	["apit"] = {
-		class = "hvap_bullet_ap",
-		info = {
-			Large=false,
-			SelfDestr=false,
-			Flak=false,
-			Tracer=true,--tracer?
-			Timer=12,-- time to remove bullet or to explode if SelfDestr
-			col=Color(255, 10, 10),
-			Speed=890,--velocity m/s
-			Radius=32,--caliber
-			Penetrate= 20,--caliber
-			BallisticDrag	= 50.8,
-			Drift=1.5875,
-			Mass=102,--g
-			TissueDamage = math.Rand(34,42),--
-			EffectSize = 10,
-			Size=12.7--caliber
-		}
-	},
 }
 
 ENT.Sounds = {
-	shoot = "hvap/gun/m2_loop.wav", -- sound played when firing
-	stop = "hvap/gun/m2_end.wav", -- sound played when stop firing
+	shoot = "hvap/gun/mg151_loop.wav", -- sound played when firing
+	stop = "hvap/gun/mg151_end.wav", -- sound played when stop firing
 	blankstop = "hvap/gun/misc/overheated_click_stop.wav", -- sound played when firing but jammed
 	blankshoot = "hvap/gun/misc/overheated_click.wav", -- sound played when stop firing but hammed 
 	clickstop = "hvap/gun/misc/overheat_click_stop.wav", -- sound plaed when near overheat

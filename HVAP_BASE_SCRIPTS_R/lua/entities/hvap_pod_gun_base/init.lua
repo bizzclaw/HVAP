@@ -89,9 +89,11 @@ function ENT:fireBullet(pos)
 	self:AddOnRemove(b)
 	self:MuzzleEffect(pos2, self.Caliber)
 	
+	sound.Play( self.Sounds.fire, pos2, 145, math.Clamp(self.SndPitch-2+(10*(self.CurrentHeat/1000)^3),0,255), 1 )	
+	
 	self.bulletIndex = self.bulletIndex + 1
 	if ( self.bulletIndex > #self.AmmoBelt ) then
-	self.bulletIndex = 1
+		self.bulletIndex = 1
 	end
 end
 

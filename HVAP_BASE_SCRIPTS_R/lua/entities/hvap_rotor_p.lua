@@ -26,6 +26,8 @@ function ENT:Initialize()
 	self.Phys:SetMass(self.Mass)
 	self.Phys:EnableGravity(false)
 	self.Phys:EnableDrag(false)
+	self.Phys:SetAngleDragCoefficient( 1.024 )
+	self.Phys:SetDragCoefficient( 0 )
 	self.Disabled = false
 	self.rotorRPM = 0
 	self.EngRpm = 0 
@@ -48,21 +50,6 @@ function ENT:Think()
 		self:SetBodygroup(1, bodygroup)
 		self:SetColor(Color(255,255,255,math.Clamp(1.3-self.rotorRPM,0.1,1)*255))	
 		
-		if self.aircraft.CrRotorWash then
-			if self.rotorRPM > 0.4 then
-				if !self.RotorWash then
-					self.RotorWash = ents.Create("env_rotorwash_emitter")
-					self.RotorWash:SetPos(self.Entity:GetPos())
-					self.RotorWash:SetParent(self.Entity)
-					self.RotorWash:Activate()
-				end
-			else
-				if self.RotorWash then
-					self.RotorWash:Remove()
-					self.RotorWash = nil
-				end
-			end
-		end
 		if self.rotorRPM > 0.1 then
 			for i=0,360, 22 do
 				local trd={}
@@ -94,14 +81,10 @@ function ENT:PhysicsUpdate(ph)
 	self.angvel = ph:GetAngleVelocity()
 	local upvel = self:WorldToLocal(self:GetVelocity()+self:GetPos()).x
 	local phm = FrameTime()*66
-	self.Brake = (
-			math.Clamp(math.abs(self.angvel.x)-self.MaxRPM, 0, 100)/10+
-			math.pow(1/((math.abs(self.angvel.x))/(self.MaxRPM)), .5)+
-			math.abs(self.angvel.x/10000)-(upvel-self.rotorRPM)*(self.aircraft.Throttle)/1000
-	)
-	self.targetAngVel = Vector(math.Clamp(((self.EngRpm*self.MaxRPM/192)+self.angvel:Length()/self.MaxRPM)*self.Dir, -16,16), 0, 0)-self.angvel*self.Brake/320
+	self.targetAngVel = Vector(((self.aircraft.Throttle^2)*58 + self.EngRpm*3.2)*self.Dir, 0, 0)
 	ph:AddAngleVelocity(self.targetAngVel)
 	self.rotorRPM = math.Clamp((self.angvel.x/self.MaxRPM)*self.Dir, -2, 2)
+	print(	self.rotorRPM)
 	self.LastPhys = CurTime()
 end
 

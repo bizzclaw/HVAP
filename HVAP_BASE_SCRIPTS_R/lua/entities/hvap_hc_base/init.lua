@@ -947,22 +947,22 @@ function ENT:setEngine(b)
 end
 
 function ENT:calcHover(ph,pos,vel,ang)
-	if self:GetHover() and !self.spinout then
+	if self:GetHover() and !self.spinout and !self.disabled then
 		local v=self:WorldToLocal(pos+vel)
 		local av=ph:GetAngleVelocity()
 
 		if self.controls.pitch < 0.2 then 
-			pitch = math.Clamp(-ang.p*0.6-av.y*0.6-v.x*0.025,-0.65,0.65)
+			pitch = math.Clamp(-ang.p*0.64-av.y*0.64-v.x*0.064,-06465,0.64)
 		else
 			pitch = 0
 		end
 		if self.controls.roll < 0.2 then 
-			roll = math.Clamp(-ang.r*0.6-av.x*0.6+v.y*0.025,-0.65,0.65)
+			roll = math.Clamp(-ang.r*0.64-av.x*0.64+v.y*0.064,-0.64,0.64)
 		else
 			roll = 0
 		end
 		if self.controls.throttle < 0.2 then 
-			throttle = math.Clamp(-v.z*0.256+av:Length()*0.025, -0.5, 0.5)
+			throttle = math.Clamp(-v.z*0.128+av:Length()*0.064, -1, 1)
 		else 
 			throttle = 0
 		end	
@@ -974,22 +974,22 @@ function ENT:calcHover(ph,pos,vel,ang)
 end
 
 function ENT:autoLevelCalc(ph,pos,vel,ang)
-	if self.AutoLevel == 1 and !self:GetHover() and !self.spinout then 
+	if self.AutoLevel == 1 and !self:GetHover() and !self.spinout and !self.disabled then 
 		local v=self:WorldToLocal(pos+vel)
 		local av=ph:GetAngleVelocity()
 	
 		if self.controls.pitch < 0.1 then 
-			pitch = math.Clamp(-ang.p*0.128-av.y*2-v.x*0.005, -0.09, 0.09)
+			pitch = math.Clamp(-ang.p*0.128-av.y-v.x*0.005, -0.128, 0.128)
 		else
 			pitch = 0
 		end
 		if self.controls.roll < 0.1 then 
-			roll = math.Clamp(-ang.r*0.128-av.x*2+v.y*0.015, -0.09, 0.09)	
+			roll = math.Clamp(-ang.r*0.128-av.x+v.y*0.015, -0.128, 0.128)	
 		else
 			roll = 0
 		end
 		if self.controls.throttle < 0.1 then 
-			throttle = math.Clamp(-v.z*0.1, -0.5, 0.5)
+			throttle = math.Clamp(-v.z*0.128+av:Length()*0.032, -1, 1)
 		else 
 			throttle = 0
 		end	

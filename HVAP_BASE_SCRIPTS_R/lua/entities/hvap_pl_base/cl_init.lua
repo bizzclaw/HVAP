@@ -1,6 +1,8 @@
 
 include("shared.lua")
 
+ENT.RenderGroup = RENDERGROUP_BOTH
+
 function ENT:receiveInput(name, value, seat)
 	local player = LocalPlayer()
 	if name == "FreeView"  then
@@ -87,100 +89,151 @@ function ENT:Think()
 		local rotorpitch = math.Clamp(self.rotorRpm*100+mod*self.rotorRpm, 0, 200)
 		local rotorvolume = math.Clamp(self.rotorRpm*100 + doppler + self:GetVelocity():Length()/50, 0, 200)/100
 		local cockpit = math.Clamp(self.smoothUp*5+self.engineRpm*70, 0, 120)
+		local rpms = self.rotorRpm*1000
 
---------------------------enginenear
-		if self.engineRpm*100 > .0000005 then
-			if pos:Distance(spos) < 6000 then
-				if !self.sounds.EngineNear:IsPlaying() then
-					self.sounds.EngineNear:PlayEx(0,enginerpm)
-				else
-					self.sounds.EngineNear:ChangePitch(enginerpm, 1)
-					self.sounds.EngineNear:ChangeVolume(volume*math.Clamp(enginevolume, 0, inVehicle and .256 or 1), 0.1)
-				end
-			else 
-				if self.sounds.EngineNear:IsPlaying() then
-					self.sounds.EngineNear:Stop()
-				end
-			end
---------------------------enginefar
-			if pos:Distance(spos) > 1920 and pos:Distance(spos) < 10240 then
-				if !self.sounds.EngineFar:IsPlaying() then
-					self.sounds.EngineFar:PlayEx(0,enginerpm)
-				else
-					self.sounds.EngineFar:ChangePitch(math.Clamp(enginerpm, 0, 150), 1)
-					self.sounds.EngineFar:ChangeVolume(volume*math.Clamp(enginevolume, 0, inVehicle and 0 or 1), 0.1)				
-				end
-			else 
-				if self.sounds.EngineFar:IsPlaying() then
-					self.sounds.EngineFar:Stop()
-				end
-			end
---------------------------whine
-			if pos:Distance(spos) < 4000 then
-				if !self.sounds.EngineWhine:IsPlaying() then
-					self.sounds.EngineWhine:PlayEx(0,enginerpm)
-				else
-					self.sounds.EngineWhine:ChangePitch(math.Clamp(enginerpm, 0, 150), 1)
-					self.sounds.EngineWhine:ChangeVolume(volume*math.Clamp(enginevolume, 0, inVehicle and 0.128 or 0.512), 0.1)	
-				end
-			else 
-				if self.sounds.EngineWhine:IsPlaying() then
-					self.sounds.EngineWhine:Stop()
-				end
-			end						
---------------------------cockpit		
-			if inVehicle then
-				if !self.sounds.Cockpit:IsPlaying() then
-					self.sounds.Cockpit:PlayEx(0,cockpit)
-				else 
-					self.sounds.Cockpit:ChangePitch(cockpit, 0.4)
-					self.sounds.Cockpit:ChangeVolume(volume*math.Clamp(enginevolume, 0, inVehicle and .512 or 0), 0.1)
-				end
+------------------------------------------------------------------------------
+		if rpms > .00005 and !inVehicle then
+			if !self.sounds.RPM1:IsPlaying() then
+				self.sounds.RPM1:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
 			else
-				if self.sounds.Cockpit:IsPlaying() then
-					self.sounds.Cockpit:Stop()
-				end			
+				self.sounds.RPM1:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
 			end
---------------------------end enginecontroller
-		else
-			self.sounds.Cockpit:Stop()	
-			self.sounds.EngineNear:Stop()
-			self.sounds.EngineFar:Stop()				
-			self.sounds.EngineWhine:Stop()	
+			if rpms < 200 then
+				self.sounds.RPM1:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			elseif rpms > 200 and rpms < 230 then
+				self.sounds.RPM1:ChangeVolume(volume*math.Clamp(enginevolume*math.abs(rpms-230), 0, 1), 0.1)
+			elseif self.sounds.RPM1:IsPlaying() then
+				self.sounds.RPM1:Stop()
+			end		
 		end
---------------------------------------------------------------------------------------------------------
---------------------------bladesnear
-		if self.rotorRpm*100 > .0000005 then
-			if pos:Distance(spos) < 8092 then 
-				if !self.sounds.RotorNear:IsPlaying() then
-					self.sounds.RotorNear:PlayEx(0,rotorpitch)
-				else
-					self.sounds.RotorNear:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)
-					self.sounds.RotorNear:ChangeVolume(volume*math.Clamp(rotorvolume, 0, inVehicle and .2 or 1), 0.1)
-				end
-			else 
-				if self.sounds.RotorNear:IsPlaying() then
-					self.sounds.RotorNear:Stop()
-				end
+------------------------------------------------------------------------------
+		if rpms > 220 and !inVehicle then
+			if !self.sounds.RPM2:IsPlaying() then
+				self.sounds.RPM2:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM2:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
 			end
---------------------------bladesfar
-			if pos:Distance(spos) > 4096 and pos:Distance(spos) < 13200 then 
-				if !self.sounds.RotorFar:IsPlaying() then
-					self.sounds.RotorFar:PlayEx(0,rotorpitch)
-				else
-					self.sounds.RotorFar:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)
-					self.sounds.RotorFar:ChangeVolume(volume*math.Clamp(rotorvolume, 0, inVehicle and 0 or 1), 0.1)				
-				end
-			else 
-				if self.sounds.RotorFar:IsPlaying() then
-					self.sounds.RotorFar:Stop()
-				end
-			end
-		else
-			self.sounds.RotorNear:Stop()
-			self.sounds.RotorFar:Stop()
+			if rpms < 400 then
+				self.sounds.RPM2:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			elseif rpms > 400 and rpms < 430 then
+				self.sounds.RPM2:ChangeVolume(volume*math.Clamp(enginevolume*math.abs(rpms-430), 0, 1), 0.1)
+			elseif self.sounds.RPM2:IsPlaying() then
+				self.sounds.RPM2:Stop()
+			end		
 		end
---------------------------	
+------------------------------------------------------------------------------		
+		if rpms > 420 and !inVehicle then
+			if !self.sounds.RPM3:IsPlaying() then
+				self.sounds.RPM3:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM3:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
+			end
+			if rpms < 600 then
+				self.sounds.RPM3:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			elseif rpms > 600 and rpms < 630 then
+				self.sounds.RPM3:ChangeVolume(volume*math.Clamp(enginevolume*math.abs(rpms-630), 0, 1), 0.1)
+			elseif self.sounds.RPM3:IsPlaying() then
+				self.sounds.RPM3:Stop()
+			end		
+		end
+------------------------------------------------------------------------------		
+		if rpms > 620 and !inVehicle then
+			if !self.sounds.RPM4:IsPlaying() then
+				self.sounds.RPM4:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM4:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
+			end
+			if rpms < 800 then
+				self.sounds.RPM4:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			elseif rpms > 800 and rpms < 830 then
+				self.sounds.RPM4:ChangeVolume(volume*math.Clamp(enginevolume*math.abs(rpms-830), 0, 1), 0.1)
+			elseif self.sounds.RPM4:IsPlaying() then
+				self.sounds.RPM4:Stop()
+			end		
+		end
+------------------------------------------------------------------------------		
+		if rpms > 820 and !inVehicle then
+			if !self.sounds.RPM5:IsPlaying() then
+				self.sounds.RPM5:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM5:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
+				self.sounds.RPM5:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			end
+		elseif self.sounds.RPM5:IsPlaying() then
+			self.sounds.RPM5:Stop()
+		end		
+------------------------------------------------------------------------------------------------------------------------------------------------------------cockpit		
+		if rpms > .00005 and inVehicle then
+			if !self.sounds.RPM1in:IsPlaying() then
+				self.sounds.RPM1in:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM1in:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
+			end
+			if rpms < 200 then
+				self.sounds.RPM1in:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			elseif rpms > 200 and rpms < 230 then
+				self.sounds.RPM1in:ChangeVolume(volume*math.Clamp(enginevolume*math.abs(rpms-230), 0, 1), 0.1)
+			elseif self.sounds.RPM1in:IsPlaying() then
+				self.sounds.RPM1in:Stop()
+			end		
+		end
+------------------------------------------------------------------------------
+		if rpms > 220 and inVehicle then
+			if !self.sounds.RPM2in:IsPlaying() then
+				self.sounds.RPM2in:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM2in:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
+			end
+			if rpms < 400 then
+				self.sounds.RPM2in:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			elseif rpms > 400 and rpms < 430 then
+				self.sounds.RPM2in:ChangeVolume(volume*math.Clamp(enginevolume*math.abs(rpms-430), 0, 1), 0.1)
+			elseif self.sounds.RPM2in:IsPlaying() then
+				self.sounds.RPM2in:Stop()
+			end		
+		end
+------------------------------------------------------------------------------		
+		if rpms > 420 and inVehicle then
+			if !self.sounds.RPM3in:IsPlaying() then
+				self.sounds.RPM3in:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM3in:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
+			end
+			if rpms < 600 then
+				self.sounds.RPM3in:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			elseif rpms > 600 and rpms < 630 then
+				self.sounds.RPM3in:ChangeVolume(volume*math.Clamp(enginevolume*math.abs(rpms-630), 0, 1), 0.1)
+			elseif self.sounds.RPM3in:IsPlaying() then
+				self.sounds.RPM3in:Stop()
+			end		
+		end
+------------------------------------------------------------------------------		
+		if rpms > 620 and inVehicle then
+			if !self.sounds.RPM4in:IsPlaying() then
+				self.sounds.RPM4in:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM4in:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
+			end
+			if rpms < 800 then
+				self.sounds.RPM4in:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			elseif rpms > 800 and rpms < 830 then
+				self.sounds.RPM4in:ChangeVolume(volume*math.Clamp(enginevolume*math.abs(rpms-830), 0, 1), 0.1)
+			elseif self.sounds.RPM4in:IsPlaying() then
+				self.sounds.RPM4in:Stop()
+			end		
+		end
+------------------------------------------------------------------------------		
+		if rpms > 820 and inVehicle then
+			if !self.sounds.RPM5in:IsPlaying() then
+				self.sounds.RPM5in:PlayEx(math.Clamp(rotorpitch, 0, 150),enginerpm)
+			else
+				self.sounds.RPM5in:ChangePitch(math.Clamp(rotorpitch, 0, 150), 1)		
+				self.sounds.RPM5in:ChangeVolume(volume*math.Clamp(enginevolume, 0, 1), 0.1)
+			end
+		elseif self.sounds.RPM5in:IsPlaying() then
+			self.sounds.RPM5in:Stop()
+		end		
+------------------------------------------------------------------------------			
 		if self.sounds.Start then
 			self.sounds.Start:ChangeVolume(volume*math.Clamp(100 - self.engineRpm*110, 0, inVehicle and 1 or 0.8)/100, 0.1)
 			self.sounds.Start:ChangePitch(100 - self.engineRpm*20, 0.1)
@@ -188,11 +241,11 @@ function ENT:Think()
 		self.LastThink=CurTime()
 	else
 		self.sounds.Cockpit:Stop()	
-		self.sounds.RotorNear:Stop()
-		self.sounds.RotorFar:Stop()
-		self.sounds.EngineNear:Stop()
-		self.sounds.EngineFar:Stop()
-		self.sounds.EngineWhine:Stop()
+		self.sounds.RPM1:Stop()
+		self.sounds.RPM2:Stop()
+		self.sounds.RPM3:Stop()
+		self.sounds.RPM4:Stop()
+		self.sounds.RPM5:Stop()
 		if self.sounds.Start then
 			self.sounds.Start:Stop()
 		end
@@ -527,7 +580,7 @@ function ENT:DrawPilotHud()
 	surface.DrawLine(280, 5*ang.r-200-2.77*(ang.p*0.12), 470, 5*ang.r-200-2.77*ang.p)
 	surface.DrawLine(280, 5*ang.r-200-2.77*(ang.p*0.12)+1, 470, 5*ang.r-200-2.77*ang.p+1)
 	surface.SetMaterial(HudMat)
-	surface.DrawTexturedRect(-20,250-upm*250-10,20,20)
+	surface.DrawTexturedRect(-20,250-upm*500+240,20,20)
 	surface.DrawTexturedRectRotated(512,math.Clamp(250-self:GetVelocity().z/5.249*2,0,500),20,20,180)
 	surface.SetTextColor(HudCol)
 	surface.SetFont("hvap_heli_small")

@@ -262,7 +262,7 @@ function ENT:calcAerodynamics(ph)
 		- self:LocalToWorld(self.Aerodynamics.Rail * lvel * dvel * dvel / 1000000000) + self:GetPos()
 		+ self:LocalToWorld(
 			self.Aerodynamics.Movement.Forwards * lvel.x * dvel / 10000000 +
-			self.Aerodynamics.Movement.Right * lvel.y * dvel / 10000000 +
+			self.Aerodynamics.Movement.Right * Vector(math.abs(lvel.y),lvel.y,lvel.y) * dvel / 10000000 +
 			self.Aerodynamics.Movement.Up * lvel.z * dvel / 10000000
 		) - self:GetPos()
 	)
@@ -293,40 +293,25 @@ function ENT:Think()
 		self:updateSkin(self.skin)
 	end	
 	
-	if self.CoopEngines then -----coop calc engines to rotors
-		for i = 1, self.NumEngines do 
-			rpm = rpm + self.engines[i].engineRpm
-			rpmcap = rpmcap + self.engines[i].MaxRPM
-			power = power + self.engines[i].enginePower
+	for i = 1, self.NumEngines do 
+		rpm = rpm + self.engines[i].engineRpm
+		rpmcap = rpmcap + self.engines[i].MaxRPM
+		power = power + self.engines[i].enginePower
+	end
+	self.EnginesRPM = rpm/rpmcap
+	self.EnginePower = power/self.Weight
+	for i = 1, self.NumEngines do
+		if !self.rotors[i].Disabled then
+			self.rotors[i].EngRpm = self.engines[i].engineRpm/self.Engines[i].info.MaxRPM
 		end
-		self.EnginesRPM = rpm/rpmcap
-		self.EnginePower = power
-		if !self.rotors[1].Disabled then
-			self.rotors[1].EngRpm = self.EnginesRPM
-			self.rotorRpm = self.rotors[1].rotorRPM
-		else
-			self.rotorRpm = 0
+	end
+	for i = 1, self.NumEngines do 
+		if !self.rotors[i].Disabled then
+			rotrpm = rotrpm + self.rotors[i].rotorRPM
 		end
-	else ------separate calc engine to rotor assuming 1 engine per rotor
-		for i = 1, self.NumEngines do 
-			rpm = rpm + self.engines[i].engineRpm
-			rpmcap = rpmcap + self.engines[i].MaxRPM
-			power = power + self.engines[i].enginePower
-		end
-		self.EnginesRPM = rpm/rpmcap
-		self.EnginePower = power
-		for i = 1, self.NumEngines do
-			if !self.rotors[i].Disabled then
-				self.rotors[i].EngRpm = self.engines[i].engineRpm/self.Engines[i].info.MaxRPM
-			end
-		end
-		for i = 1, self.NumEngines do 
-			if !self.rotors[i].Disabled then
-				rotrpm = rotrpm + self.rotors[i].rotorRPM
-			end
-		end
-		self.rotorRpm = rotrpm/self.NumRotors
-	end 
+	end
+	self.rotorRpm = rotrpm/self.NumRotors
+
 ------------------------------------------------------------------------------------------------throttle calc	
 	if self.IncrementalThr == 1 then
 		self.Throttle = math.Clamp(self.Throttle+(self.controls.throttle*self.ThrSensitivity)/1024, 0, 1)
@@ -472,61 +457,88 @@ function ENT:PhysicsUpdate(ph)
 	local pos = self:GetPos()
 	local lvel = self:WorldToLocal(pos+vel)
 	local fwd = self:GetForward()
+	local up = self:GetUp()
 	local ang = self:GetAngles()
 	local phm = FrameTime()*66
 	local fscl = (self.FuselageHealth/self.FuselageBaseHealth)	
 	local speed = 0
 	local gear = 0 
-	local reduce = Vector(0,0,0)
-	local damaged = Vector(0,0,0)	
-	local MoveDynamics, AngleDynamics = self:calcAerodynamics(ph)	
+	local aeroVelocity, aeroAng = self:calcAerodynamics(ph)
+	
+	if vell < self.MinSPD then
+		speed = (vell/self.MinSPD)
+		gear = 30 
+		reduce = Vector( .1, .64, 0.128 )
+		rotate = Vector(0.4,0.8,0.8)
+	elseif vell >= self.MinSPD && vell < self.CruSPD then
+		speed = (vell/self.CruSPD)
+		gear = 38
+		reduce = Vector( 0.2, .768, .192 )
+		rotate = Vector(1,1,1)
+	elseif vell >= self.CruSPD && vell < self.MaxSPD then
+		speed = (vell/self.MaxSPD)
+		gear = 44
+		reduce = Vector( .256, .8, .256 )
+		rotate = Vector(1,1,1)
+	elseif vell >= self.MaxSPD then
+		speed = (vell/self.MaxSPD)*.64
+		gear = 36
+		reduce = Vector( .32, .8, .32 )
+		rotate = Vector(0.64, 0.64, 0.4)
+	end
 	
 	local controlAng = Vector (
 		(self.controls.roll),
 		(self.controls.pitch),
 		(self.controls.yaw)
-	)*self.Aerodynamics.Rotate
-
-	if vell < self.MinSPD then
-		speed = (vell/self.MinSPD)
-		gear = 3 
-		reduce = Vector( .8, .64, 0.512 )
-	elseif vell >= self.MinSPD && vell < self.CruSPD then
-		speed = (vell/self.CruSPD)
-		gear = 6
-		reduce = Vector( 1, 1.28, 1 )
-	elseif vell >= self.CruSPD && vell < self.MaxSPD then
-		speed = (vell/self.MaxSPD)
-		gear = 4
-		reduce = Vector( .8, 1, .8 )
-	elseif vell >= self.MaxSPD then
-		speed = (vell/self.MaxSPD)*.64
-		gear = 2
-		reduce = Vector( .8, .4, .4 )
-	end
+	)*self.Aerodynamics.Rotate*(rotate)
 	
-	if vell < self.MinSPD then
+	if vell < self.MinSPD*0.9 then
 		local av=ph:GetAngleVelocity()
-		p = math.Clamp(80-ang.p-av.y*0.1-lvel.x*0.005,-6.144/speed,6.144/speed)
-		ph:AddAngleVelocity(Vector(0,p,0)*speed*phm)
+		p = math.Clamp(( -(up:AngleEx(Vector(0,0,-1)).p)-av.y*0.1-lvel.x*0.05),-2/speed,2/speed)
+--		ph:AddAngleVelocity(Vector(0,p,0)*speed*phm)
 	end	
 
 	if fscl <= .64 then
 		damaged = Vector(math.Rand(-1,1)*(1-fscl)*self.rotorRpm, math.Rand(-1,1)*(1-fscl)*self.rotorRpm, math.Rand(-1,1)*(1-fscl)*self.rotorRpm)
 	end
+
+
+
+	local rotsub = (angvel:Length()/32)*self.rotorRpm
+	local controlThrottle = fwd * (( self.rotorRpm + (self.rotorRpm+self.Throttle)/10) * (self.EnginePower)*gear+speed ) -reduce*rotsub
 	
-	local momentum = ((1-speed)*2+ speed)*self.rotorRpm*self.EnginesRPM
-	local rotsub =  angvel:Length()/5.12
-	local controlThrottle = (((self.Throttle^.5 + speed )*(self.rotorRpm+self.EnginesRPM)^3 )*momentum) -rotsub
+	ph:AddAngleVelocity((aeroAng*speed + controlAng)*phm)
+	ph:AddVelocity((aeroVelocity + controlThrottle)*phm)
+	
+--[[	local momentum = ((1-speed)*2+ speed)*self.rotorRpm*self.EnginesRPM
+	local rotsub =  (angvel:Length()/12)*self.rotorRpm
+	local controlThrottle = ((((self.Throttle^.5 + speed )*(self.rotorRpm+self.EnginesRPM)^3 )*momentum) -rotsub)*self.EnginePower/100
 	
 	ph:AddAngleVelocity((AngleDynamics + controlAng)*phm)
-	ph:AddVelocity((MoveDynamics + fwd*controlThrottle)*phm)
+	ph:AddVelocity((MoveDynamics + fwd*controlThrottle)*phm)]]
 
 	for _,e in pairs(self.wheels) do
 		if IsValid(e) and e:GetPhysicsObject():IsValid() then
-		local wph=e:GetPhysicsObject()
-			wph:AddAngleVelocity((AngleDynamics+(controlAng))*phm*(0.5*math.pow(speed,2)+.5)*1)
-			wph:AddVelocity(((MoveDynamics) + fwd*controlThrottle)*phm*1)
+		local ph=e:GetPhysicsObject()
+			local wpos = self:WorldToLocal(e:GetPos())
+			
+			local xpositive = (wpos.x >= 0 and 1 or -1)
+			local ypositive = (wpos.y >= 0 and 1 or -1)
+
+			e:GetPhysicsObject():AddVelocity(
+				(self:LocalToWorld(Vector(0, 0,
+					(math.abs(wpos.y) ^ (1/3))*ypositive*controlAng.x
+					- (math.abs(wpos.x) ^ (1/3))*xpositive*controlAng.y
+					+ 7
+				)/4)-pos
+				+ aeroVelocity*0.8
+				+ controlThrottle*0.8
+			)*phm)
+
+			if self.Throttle < 0 then
+				ph:AddAngleVelocity(ph:GetAngleVelocity()*(self.Throttle)*phm)
+			end
 		end
 	end
 

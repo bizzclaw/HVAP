@@ -69,22 +69,26 @@ ENT.Submersible = false
 ENT.CrRotorWash = false
 
 ENT.Sounds = {
-	Start = "hvap/engine/air/helicopter/shared/heli_start_1.wav", -- heli_start_#
-	Cockpit = "hvap/engine/air/helicopter/hc_1/cockpit.wav", -- cockpit
+	Start = "hvap/engine/air/helicopter/shared/heli_start_1.wav",
+
+	RPM1 = "hvap/engine/air/plane/attacker_01/external_800.wav",
+	RPM2 = "hvap/engine/air/plane/attacker_01/external_1600.wav",
+	RPM3 = "hvap/engine/air/plane/attacker_01/external_2000.wav",
+	RPM4 = "hvap/engine/air/plane/attacker_01/external_2000.wav",
+	RPM5 = "hvap/engine/air/plane/attacker_01/external_2500.wav",
 	
-	BladesNear = "hvap/engine/air/helicopter/hc_1/rotor_close.wav", -- rotor_close
-	EngineNear = "hvap/engine/air/helicopter/hc_1/engine_close.wav", -- engine_close
-	EngineWhine = "hvap/engine/air/helicopter/hc_1/turbine.wav", -- turbine
-	
-	BladesFar = "hvap/engine/air/helicopter/hc_1/rotor_far.wav", -- rotor_far
-	EngineFar = "hvap/engine/air/helicopter/hc_1/engine_far.wav", -- engine_far
+	RPM1in = "hvap/engine/air/plane/attacker_01/internal_800.wav",
+	RPM2in = "hvap/engine/air/plane/attacker_01/internal_1600.wav",
+	RPM3in = "hvap/engine/air/plane/attacker_01/internal_2000.wav",
+	RPM4in = "hvap/engine/air/plane/attacker_01/internal_2000.wav",
+	RPM5in = "hvap/engine/air/plane/attacker_01/internal_2500.wav",
 
 	MissileAlert = "hvap/alarm/missilenearby.wav",
 	MinorAlarm = "hvap/alarm/minor_alarm.wav",
 	LowHealth = "hvap/alarm/low_health.wav",
 	CrashAlarm = "hvap/alarm/crash_alarm.wav",
 	Burning = "hvap/tank/tank_fire_0"..math.random(1,3)..".wav",
-	Spinout = ""
+	Stall = ""
 }
 
 function ENT:addSounds()
@@ -94,22 +98,34 @@ function ENT:addSounds()
 			sound.Add({
 				name = "hvap."..self.ClassName.."."..name,
 				channel = CHAN_AUTO,
-				soundlevel = (name == "RotorNear" and 116 or name == "RotorFar" and 132 or name == "EngineNear" and 105 or name == "EngineFar" and 120 or name == "EngineWhine" and 80 or 100),
+				soundlevel = 100,
 				sound = value
 			})
 			self.sounds[name] = CreateSound(self, "hvap."..self.ClassName.."."..name)
-			if name == "RotorNear" then
-				self.sounds[name]:SetSoundLevel(116)
-			elseif name == "RotorFar" then
+			if name == "RPM1" then
 				self.sounds[name]:SetSoundLevel(132)
-			elseif name == "EngineNear" then
-				self.sounds[name]:SetSoundLevel(105)
-			elseif name == "EngineFar" then
-				self.sounds[name]:SetSoundLevel(120)
-			elseif name == "EngineWhine" then
-				self.sounds[name]:SetSoundLevel(80)
-			elseif name == "Cockpit" then
+			elseif name == "RPM2" then
+				self.sounds[name]:SetSoundLevel(132)
+			elseif name == "RPM3" then
+				self.sounds[name]:SetSoundLevel(132)
+			elseif name == "RPM4" then
+				self.sounds[name]:SetSoundLevel(132)
+			elseif name == "RPM5" then
+				self.sounds[name]:SetSoundLevel(132)
+			elseif name == "RPM1in" then
 				self.sounds[name]:SetSoundLevel(75)
+			elseif name == "RPM2in" then
+				self.sounds[name]:SetSoundLevel(75)
+			elseif name == "RPM3in" then
+				self.sounds[name]:SetSoundLevel(75)
+			elseif name == "RPM4in" then
+				self.sounds[name]:SetSoundLevel(75)
+			elseif name == "RPM5in" then
+				self.sounds[name]:SetSoundLevel(75)
+			elseif name == "Start" then
+				self.sounds[name]:SetSoundLevel(90)
+			elseif name == "Stall" then
+				self.sounds[name]:SetSoundLevel(90)
 			end
 		end
 	end

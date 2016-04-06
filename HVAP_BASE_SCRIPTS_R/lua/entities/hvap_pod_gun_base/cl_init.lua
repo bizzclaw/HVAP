@@ -7,12 +7,12 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
-	if self.SingleFire then return end
-	local frt = CurTime()-self.LastThink
+
 	local e = LocalPlayer():GetViewEntity()
 	if !IsValid(e) then e = LocalPlayer() end
 	
 	local heatscl = self:GetSecondary()/1000
+	local crt = CurTime()
 	local pos = e:GetPos()
 	local spos = self:GetPos()
 	local doppler = (pos:Distance(spos+e:GetVelocity())-pos:Distance(spos+self:GetVelocity()))/128
@@ -27,6 +27,7 @@ function ENT:Think()
 
 	local volume = tonumber(LocalPlayer():GetInfo("hvap_cl_air_volume"))
 	local mod = (doppler+self:GetVelocity():Length()/80)
+	
 	if self:GetNWBool("shooting") then
 		if !self:GetNWBool("overheated") then
 			self.sounds.blankshoot:Stop()
@@ -69,11 +70,8 @@ function ENT:Think()
 		self.sounds.GunReady:Stop()
 	end
 
---------------------------------------------------	
-
---------------------------------------------------	
-	self.LastThink=CurTime()
-
+	self:NextThink(crt)
+	return true
 end
 
 function ENT:drawCrosshair()
