@@ -1,0 +1,30 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models\jessev92/ww2_dods/gaz67/jeep_ussr_gaz-67"
+	"$bumpmap" "models\jessev92/ww2_dods/gaz67/jeep_ussr_gaz-67_normal"
+	"$translucent"	1
+	//"$alpha"	1
+	"$alphatest"	1
+
+	$model 1
+
+	"$halflambert" 1
+	$phong 1
+	"$phongexponent" "9001"
+	"$phongboost" "2"	
+	//"$phongalbedoboost" "50"
+	"$phongalbedotint" 1
+	//"$phongdisablehalflambert" 1
+	//$basemapalphaphongmask 1
+
+	"$envmap" "env_cubemap"
+	"$envmapfresnel" "1"
+	"$envmapcontrast" "1"
+	"$envmapFresnelMinMaxExp" "[ 0 0.1 0.1]"
+	"$envmaptint" "[.005 .005 .005]"
+	
+	"$rimlight" "1"												// To enable rim lighting (requires phong)
+	"$rimlightexponent" "75"										// Exponent for phong component of rim lighting	
+	"$rimlightboost" "0.07"	
+
+}

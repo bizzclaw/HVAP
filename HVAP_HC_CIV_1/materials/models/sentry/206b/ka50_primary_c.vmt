@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/sentry/KA50/ka50_primary_c"
+	"$no_draw" "1"
+}

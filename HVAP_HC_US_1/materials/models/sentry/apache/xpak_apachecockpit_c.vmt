@@ -1,0 +1,14 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/sentry/Apache/xpak_apachecockpit_c"
+	"$bumpmap" "models/sentry/Apache/xpak_apachecockpit_b"
+	"$nocull" "1"
+	"$phong" "1"
+	"$phongexponent" 35
+	"$phongboost" "0.5"
+	"$phongfresnelranges"	"[ .6 3 9]"
+
+	"$rimlight" "1"						
+	"$rimlightexponent" "50"				
+	"$rimlightboost" "0.02"
+}

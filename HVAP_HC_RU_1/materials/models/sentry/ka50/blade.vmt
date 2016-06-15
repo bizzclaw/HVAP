@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/sentry/ka50/blade"
+	"$translucent" 1
+	"$nocull" "1"
+}

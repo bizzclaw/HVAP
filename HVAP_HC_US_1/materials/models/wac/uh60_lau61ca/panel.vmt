@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/wac/uh60_lau61ca/panel"
+	"$Selfillum" "1"
+}

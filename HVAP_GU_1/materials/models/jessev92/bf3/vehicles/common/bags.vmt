@@ -1,0 +1,16 @@
+
+VertexlitGeneric
+{
+
+	$basetexture				models/jessev92/bf3/vehicles/common/bags_d
+	$bumpmap					dev/bump_normal
+	
+	$ambientocclusion			1
+	$halflambert				1
+	
+	$detail						detail/metal_detail_01
+	$detailscale				24
+	$detailblendfactor			0.25
+	$detailblendmode			0
+	
+}

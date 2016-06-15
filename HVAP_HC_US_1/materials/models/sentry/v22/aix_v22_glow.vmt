@@ -1,0 +1,6 @@
+"unlitGeneric"
+{
+	"$basetexture" "models/sentry/v22/aix_v22_glow"
+	"$translucent" 1
+	 $selfillum 1
+}

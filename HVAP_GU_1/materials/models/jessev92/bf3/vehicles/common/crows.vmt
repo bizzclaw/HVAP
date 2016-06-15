@@ -1,0 +1,17 @@
+
+VertexlitGeneric
+{
+
+	$basetexture					models/jessev92/bf3/vehicles/common/crows_d
+	$bumpmap						dev/bump_normal
+	
+	$ambientocclusion				1
+	$halflambert					1
+	$nocull							1
+
+	$detail          			   	detail/metal_detail_01
+	$detailscale					12
+	$detailblendfactor				0.25
+	$detailblendmode				0
+
+}

@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/sentry/206B/gauge2"
+	"$translucent" 1
+}

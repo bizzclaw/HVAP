@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "sentry/RAH66/comanche_rotor_c"
+	"$translucent" 1
+	"$nocull" "1"
+}

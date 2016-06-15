@@ -1,0 +1,5 @@
+"UnlitGeneric"
+{
+	"$basetexture" "sentry/mhx/instruments"
+	"$additive" 1
+}

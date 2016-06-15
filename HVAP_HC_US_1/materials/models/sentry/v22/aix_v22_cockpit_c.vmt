@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/sentry/v22/aix_v22_cockpit_c"
+	"$bumpmap" "models/sentry/v22/aix_v22_cockpit_b"
+	"$nocull" 1
+}
