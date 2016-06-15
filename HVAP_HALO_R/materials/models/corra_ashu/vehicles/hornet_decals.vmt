@@ -1,6 +1,0 @@
-"VertexlitGeneric"
-{
-	"$basetexture" "models/Corra_Ashu/Vehicles/hornet_decals"
-	"$surfaceprop" "Metal_Box"
-	"$translucent" 1
-}
